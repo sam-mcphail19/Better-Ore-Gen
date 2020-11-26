@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "betteroregen",
+  "version": "${version}",
+
+  "name": "Better Ore Gen",
+  "description": "",
+  "authors": [
+
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "CC0-1.0",
+  "icon": "resources/assets/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.sammc19.betteroregen.BetterOreGen"
+    ]
+  },
+  "mixins": [
+    "betteroregen.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
