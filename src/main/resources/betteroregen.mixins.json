@@ -4,6 +4,7 @@
   "package": "me.sammc19.betteroregen.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "OreFeatureMixin"
   ],
   "client": [
 
