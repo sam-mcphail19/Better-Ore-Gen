@@ -1,4 +1,4 @@
-package me.sammc19.betteroregen;
+package me.sammc19.betteroregen.generation;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

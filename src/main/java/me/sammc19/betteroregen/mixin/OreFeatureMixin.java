@@ -1,7 +1,6 @@
 package me.sammc19.betteroregen.mixin;
 
 import me.sammc19.betteroregen.BetterOreGen;
-import me.sammc19.betteroregen.OreRemover;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldAccess;
