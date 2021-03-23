@@ -8,7 +8,7 @@ import me.sammc19.betteroregen.generation.OreVein;
 import me.sammc19.betteroregen.generation.VeinGenerator;
 import net.fabricmc.api.ModInitializer;
 
-import net.minecraft.util.registry.Registry;
+import net.minecraft.block.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,6 +25,8 @@ public class BetterOreGen implements ModInitializer {
     public static OreRemover oreRemover;
     public static VeinGenerator veinGenerator;
 
+    public static ArrayList<BlockState> ores = new ArrayList<>();
+    public static ArrayList<BlockState> stones = new ArrayList<>();
     public static ArrayList<OreVein> oreVeins = new ArrayList<>();
 
     @Override

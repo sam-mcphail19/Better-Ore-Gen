@@ -1,5 +1,6 @@
 package me.sammc19.betteroregen.generation;
 
+import me.sammc19.betteroregen.BetterOreGen;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -9,36 +10,17 @@ import java.util.ArrayList;
 
 public class OreRemover {
 
-    //TODO: move list of ores into some config/JSON and add a method/class to read those in on init
-    public static final ArrayList<BlockState> ORES = new ArrayList<>();
-    private static final ArrayList<BlockState> BASIC_BLOCKS = new ArrayList<>();
-
     private static final BlockState STONE = Blocks.STONE.getDefaultState();
 
     private WorldAccess world;
 
-    public OreRemover(){
-
-        ORES.add(Blocks.COAL_ORE.getDefaultState());
-        ORES.add(Blocks.DIAMOND_ORE.getDefaultState());
-        ORES.add(Blocks.EMERALD_ORE.getDefaultState());
-        ORES.add(Blocks.GOLD_ORE.getDefaultState());
-        ORES.add(Blocks.IRON_ORE.getDefaultState());
-        ORES.add(Blocks.LAPIS_ORE.getDefaultState());
-        ORES.add(Blocks.REDSTONE_ORE.getDefaultState());
-
-        BASIC_BLOCKS.add(Blocks.BEDROCK.getDefaultState());
-        BASIC_BLOCKS.add(Blocks.STONE.getDefaultState());
-        BASIC_BLOCKS.add(Blocks.GRANITE.getDefaultState());
-        BASIC_BLOCKS.add(Blocks.DIORITE.getDefaultState());
-        BASIC_BLOCKS.add(Blocks.DIRT.getDefaultState());
-    }
+    public OreRemover(){}
 
     public BlockState removeOre(WorldAccess world, BlockPos blockPos, BlockState blockState){
         this.world = world;
-        if(ORES.contains(blockState)){
+        if(BetterOreGen.ores.contains(blockState)){
             ArrayList<BlockState> adjacentBlocks = getAdjacentBlocks(blockPos);
-            for(BlockState block : BASIC_BLOCKS){
+            for(BlockState block : BetterOreGen.stones){
                 if(adjacentBlocks.contains(block)){
                     return block;
                 }
