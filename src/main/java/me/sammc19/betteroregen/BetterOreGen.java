@@ -34,5 +34,6 @@ public class BetterOreGen implements ModInitializer {
         BetterOreGenConfig.initializeConfig();
         oreRemover = new OreRemover();
         veinGenerator = new VeinGenerator();
+        veinGenerator.generateVein(null, null, null, null);
     }
 }
