@@ -17,5 +17,4 @@ public class StonesReader {
         }
         return block;
     }
-
 }

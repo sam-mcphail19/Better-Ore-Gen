@@ -24,5 +24,4 @@ public class Registration {
     public static Predicate<BiomeSelectionContext> booleanToPredicate(boolean bol) {
         return (context) -> bol;
     }
-
 }

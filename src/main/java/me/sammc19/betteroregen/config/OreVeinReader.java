@@ -118,5 +118,4 @@ public class OreVeinReader {
         }
         return density;
     }
-
 }
