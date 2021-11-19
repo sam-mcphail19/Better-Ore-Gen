@@ -30,4 +30,9 @@ bin/
 
 # fabric
 
-run/
+run/.fabric/*
+run/crash-reports/
+run/logs/
+run/resourcepacks/
+run/saves/
+run/usercache.json
