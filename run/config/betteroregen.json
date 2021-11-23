@@ -1,25 +1,9 @@
 {
-  "ores": [
-    "minecraft:coal_ore",
-    "minecraft:diamond_ore",
-    "minecraft:emerald_ore",
-    "minecraft:iron_ore",
-    "minecraft:gold_ore",
-    "minecraft:lapis_ore",
-    "minecraft:redstone_ore"
-  ],
-  "stones": [
-    "minecraft:bedrock",
-    "minecraft:stone",
-    "minecraft:granite",
-    "minecraft:diorite",
-    "minecraft:andesite",
-    "minecraft:dirt"
-  ],
   "veins": [
     {
       "blocks": [
-        "minecraft:diamond_block", 100
+        "minecraft:diamond_block", 80,
+        "minecraft:gold_block", 20
       ],
       "yMin": 0,
       "yMax": 100,

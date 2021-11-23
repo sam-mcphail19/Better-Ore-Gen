@@ -1,5 +1,9 @@
 package me.sammc19.betteroregen.generation;
 
+import static me.sammc19.betteroregen.BetterOreGen.LOGGER;
+
+import me.sammc19.betteroregen.BetterOreGen;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SideShapeType;
@@ -10,64 +14,87 @@ import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.feature.util.FeatureContext;
 
+import java.util.ArrayList;
 import java.util.Random;
-import java.util.Set;
 
 public class VeinGenerator {
 
     private StructureWorldAccess worldAccess;
+    private static final Random random = new Random();
 
     public boolean generate(FeatureContext<OreFeatureConfig> context) {
-        Random random = context.getRandom();
         BlockPos blockPos = context.getOrigin();
         this.worldAccess = context.getWorld();
-        OreFeatureConfig oreFeatureConfig = context.getConfig();
         int x = blockPos.getX();
         int y = blockPos.getY();
         int z = blockPos.getZ();
 
         if (y <= worldAccess.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, x, z)) {
-            return place(oreFeatureConfig, random, x, y, z);
+
+            ArrayList<OreVein> possibleOreVeins = new ArrayList<>();
+            for (OreVein oreVein : BetterOreGen.oreVeins) {
+                if (y > oreVein.yMin && y < oreVein.yMax)
+                    possibleOreVeins.add(oreVein);
+            }
+
+            if (possibleOreVeins.size() < 1)
+                return false;
+
+            OreVein selectedOreVein = possibleOreVeins.get(random.nextInt(possibleOreVeins.size()));
+
+            place(selectedOreVein, x, y, z);
+            place(selectedOreVein, x, y + 1, z);
+            place(selectedOreVein, x, y + 2, z);
+            place(selectedOreVein, x + 1, y, z);
+            place(selectedOreVein, x + 2, y, z);
+            place(selectedOreVein, x, y, z + 1);
+            place(selectedOreVein, x, y, z + 2);
+            return true;
         }
 
         return false;
     }
 
-    private boolean place(OreFeatureConfig config, Random random, int x, int y, int z) {
+    private void place(OreVein oreVein, int x, int y, int z) {
         BlockPos blockPos = new BlockPos(x, y, z);
 
-        if (blockIsFloating(new Block(blockPos)))
-            return false;
+        if (blockIsFloating(new OreVeinBlock(blockPos)))
+            return;
 
-        worldAccess.setBlockState(blockPos, Blocks.DIAMOND_BLOCK.getDefaultState(), 0);
-        return true;
+        if(!blockCanBeReplacedByVein(worldAccess.getBlockState(blockPos)))
+            return;
+
+        int randInt = random.nextInt(100);
+        int selectionIndex = 0;
+        int weightsSum = oreVein.blockWeights.get(selectionIndex);
+
+        while (weightsSum < randInt) {
+            selectionIndex++;
+            weightsSum += oreVein.blockWeights.get(selectionIndex);
+        }
+
+        Block selectedBlock = oreVein.blocks.get(selectionIndex);
+        worldAccess.setBlockState(blockPos, selectedBlock.getDefaultState(), 0);
     }
 
-    private Set<VeinGenerator.Block> getAdjacentBlocks(BlockPos blockPos) {
-        return Set.of(
-                new Block(blockPos.north()),
-                new Block(blockPos.south()),
-                new Block(blockPos.east()),
-                new Block(blockPos.west()),
-                new Block(blockPos.up()),
-                new Block(blockPos.down())
-        );
-    }
-
-    private boolean blockIsFloating(Block block) {
+    private boolean blockIsFloating(OreVeinBlock oreVeinBlock) {
         for (Direction direction : Direction.values()) {
-            if (block.blockState.isSideSolid(worldAccess, block.blockPos, direction, SideShapeType.FULL)) {
+            if (oreVeinBlock.blockState.isSideSolid(worldAccess, oreVeinBlock.blockPos, direction, SideShapeType.FULL)) {
                 return false;
             }
         }
         return true;
     }
 
-    private class Block {
+    private boolean blockCanBeReplacedByVein(BlockState blockState){
+        return blockState.isOf(Blocks.STONE);
+    }
+
+    private class OreVeinBlock {
         public BlockState blockState;
         public BlockPos blockPos;
 
-        public Block(BlockPos blockPos) {
+        public OreVeinBlock(BlockPos blockPos) {
             this.blockPos = blockPos;
             this.blockState = worldAccess.getBlockState(blockPos);
         }

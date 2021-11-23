@@ -8,7 +8,8 @@ import java.util.Map;
 
 public class OreVein {
 
-    public Map<Block, Integer> blocks;
+    public ArrayList<Block> blocks;
+    public ArrayList<Integer> blockWeights;
     public int yMin;
     public int yMax;
     public int size;
@@ -22,7 +23,8 @@ public class OreVein {
     private OreVein(){ }
 
     public static class Builder {
-        private Map<Block, Integer> blocks;
+        public ArrayList<Block> blocks;
+        public ArrayList<Integer> blockWeights;
         private int yMin;
         private int yMax;
         private int size;
@@ -35,8 +37,13 @@ public class OreVein {
 
         public Builder() { }
 
-        public Builder withBlocks(Map<Block, Integer> blocks){
+        public Builder withBlocks(ArrayList<Block> blocks){
             this.blocks = blocks;
+            return this;
+        }
+
+        public Builder withBlockWeights(ArrayList<Integer> blockWeights){
+            this.blockWeights = blockWeights;
             return this;
         }
 
@@ -79,6 +86,7 @@ public class OreVein {
             //Here we create the actual bank account object, which is always in a fully initialised state when it's returned.
             OreVein oreVein = new OreVein();  //Since the builder is in the BankAccount class, we can invoke its private constructor.
             oreVein.blocks = this.blocks;
+            oreVein.blockWeights = this.blockWeights;
             oreVein.yMin = this.yMin;
             oreVein.yMax = this.yMax;
             oreVein.size = this.size;
@@ -89,5 +97,18 @@ public class OreVein {
 
             return oreVein;
         }
+    }
+
+    public String toString(){
+        return String.format("OreVein=(blocks=%s, blockWeights=%s, yMin=%d, yMax=%d, size=%d, frequency=%f, density=%f, biomes=%s, dimensions=%s)",
+                this.blocks.toString(),
+                this.blockWeights.toString(),
+                this.yMin,
+                this.yMax,
+                this.size,
+                this.frequency,
+                this.density,
+                this.biomes.toString(),
+                this.dimensions.toString());
     }
 }

@@ -11,8 +11,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OreVeinReader {
 
@@ -21,6 +19,7 @@ public class OreVeinReader {
     public static OreVein readVein(JsonObject jsonObject){
         OreVein oreVein = new OreVein.Builder()
                 .withBlocks(readBlocks(jsonObject.get("blocks")))
+                .withBlockWeights(readBlockWeights(jsonObject.get("blocks")))
                 .withYMin(readYMin(jsonObject.get("yMin")))
                 .withYMax(readYMax(jsonObject.get("yMax")))
                 .withSize(readSize(jsonObject.get("size")))
@@ -37,30 +36,45 @@ public class OreVeinReader {
         return oreVein;
     }
 
-    private static Map<Block, Integer> readBlocks(JsonElement jsonElement){
+    private static ArrayList<Block> readBlocks(JsonElement jsonElement){
         JsonArray jsonArray = jsonElement.getAsJsonArray();
 
         if(jsonArray.size() % 2 == 1){
             throw new IllegalArgumentException("Invalid blocks array. Blocks array must be even length.");
         }
 
-        Map<Block, Integer> blocks = new HashMap<>();
-        int sum = 0;
+        ArrayList<Block> blocks = new ArrayList<>();
 
         for(int i=0; i< jsonArray.size(); i+=2){
             Block block = Registry.BLOCK.get(new Identifier(jsonArray.get(i).getAsString()));
             if(block == Blocks.AIR){
                 throw new IllegalArgumentException("Invalid blocks array. Block: \"" + jsonArray.get(i).getAsString() + "\" not found.");
             }
-            int blockAmount = jsonArray.get(i+1).getAsInt();
-            blocks.put(block, blockAmount);
-            sum += blockAmount;
+            blocks.add(block);
+        }
+        return blocks;
+    }
+
+    private static ArrayList<Integer> readBlockWeights(JsonElement jsonElement){
+        JsonArray jsonArray = jsonElement.getAsJsonArray();
+
+        if(jsonArray.size() % 2 == 1){
+            throw new IllegalArgumentException("Invalid blocks array. Blocks array must be even length.");
+        }
+
+        ArrayList<Integer> blockWeights = new ArrayList<>();
+        int sum = 0;
+
+        for(int i=1; i< jsonArray.size(); i+=2){
+            int blockWeight = jsonArray.get(i).getAsInt();
+            blockWeights.add(blockWeight);
+            sum += blockWeight;
         }
 
         if(sum != 100){
             throw new IllegalArgumentException("Invalid blocks array. Blocks must sum to 100.");
         }
-        return blocks;
+        return blockWeights;
     }
 
     private static ArrayList<Biome> readBiomes(JsonElement jsonElement){
@@ -108,7 +122,7 @@ public class OreVeinReader {
     }
 
     private static float readFrequency(JsonElement jsonElement){
-        return jsonElement.getAsInt();
+        return jsonElement.getAsFloat();
     }
 
     private static float readDensity(JsonElement jsonElement){

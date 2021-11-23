@@ -15,7 +15,6 @@ import com.google.gson.JsonObject;
 import me.sammc19.betteroregen.BetterOreGen;
 import me.sammc19.betteroregen.generation.OreVein;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.Block;
 
 
 public class BetterOreGenConfig {
@@ -32,8 +31,6 @@ public class BetterOreGenConfig {
 
         config = new File(CONFIG_PATH.toString());
         loadModConfig();
-        readOres();
-        readStones();
         readVeins();
 
         LOGGER.info("BetterOreGen Initialized");
@@ -51,30 +48,6 @@ public class BetterOreGenConfig {
 
     public static void saveModConfig() {
 
-    }
-
-    private static void readOres(){
-        JsonArray ores = json.get("ores").getAsJsonArray();
-        for(int i=0; i<ores.size(); i++) {
-            try {
-                Block newOre = OresReader.readOre(ores.get(i));
-                BetterOreGen.ores.add(newOre.getDefaultState());
-            } catch(IllegalArgumentException e){
-                LOGGER.error(e);
-            }
-        }
-    }
-
-    private static void readStones(){
-        JsonArray stones = json.get("stones").getAsJsonArray();
-        for(int i=0; i<stones.size(); i++) {
-            try {
-                Block newStone = StonesReader.readStone(stones.get(i));
-                BetterOreGen.ores.add(newStone.getDefaultState());
-            } catch(IllegalArgumentException e){
-                LOGGER.error(e);
-            }
-        }
     }
 
     private static void readVeins(){
