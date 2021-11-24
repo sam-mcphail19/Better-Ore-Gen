@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SideShapeType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.StructureWorldAccess;
@@ -30,39 +31,63 @@ public class VeinGenerator {
         int z = blockPos.getZ();
 
         if (y <= worldAccess.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, x, z)) {
-
             ArrayList<OreVein> possibleOreVeins = new ArrayList<>();
+            double frequencySum = 0;
             for (OreVein oreVein : BetterOreGen.oreVeins) {
-                if (y > oreVein.yMin && y < oreVein.yMax)
+                if (y > oreVein.yMin && y < oreVein.yMax) {
                     possibleOreVeins.add(oreVein);
+                    frequencySum += oreVein.frequency;
+                }
             }
 
             if (possibleOreVeins.size() < 1)
                 return false;
 
-            OreVein selectedOreVein = possibleOreVeins.get(random.nextInt(possibleOreVeins.size()));
+            double rand = Math.random() * frequencySum;
+            int selectionIndex = 0;
+            frequencySum = possibleOreVeins.get(selectionIndex).frequency;
+            while (frequencySum < rand) {
+                selectionIndex++;
+                frequencySum += possibleOreVeins.get(selectionIndex).frequency;
+            }
 
-            place(selectedOreVein, x, y, z);
-            place(selectedOreVein, x, y + 1, z);
-            place(selectedOreVein, x, y + 2, z);
-            place(selectedOreVein, x + 1, y, z);
-            place(selectedOreVein, x + 2, y, z);
-            place(selectedOreVein, x, y, z + 1);
-            place(selectedOreVein, x, y, z + 2);
-            return true;
+            OreVein selectedOreVein = possibleOreVeins.get(selectionIndex);
+
+            int placed = 0;
+            int size = selectedOreVein.size / 2;
+            for (int i = x - size; i < x + size; i++) {
+                for (int j = y - size; j < y + size; j++) {
+                    for (int k = z - size; k < z + size; k++) {
+                        if (place(selectedOreVein, i, j, k)) {
+                            placed++;
+                        }
+                    }
+                }
+            }
+            return placed > 0;
         }
 
         return false;
     }
 
-    private void place(OreVein oreVein, int x, int y, int z) {
+    private boolean place(OreVein oreVein, int x, int y, int z) {
+        ChunkPos chunkPos = worldAccess.getChunk(new BlockPos(x, y, z)).getPos();
+        if (!worldAccess.isChunkLoaded(chunkPos.x, chunkPos.z))
+            return false;
+
         BlockPos blockPos = new BlockPos(x, y, z);
 
-        if (blockIsFloating(new OreVeinBlock(blockPos)))
-            return;
+        if (blockIsFloating(new OreVeinBlock(blockPos))) {
+            return false;
+        }
 
-        if(!blockCanBeReplacedByVein(worldAccess.getBlockState(blockPos)))
-            return;
+        if (!blockCanBeReplacedByVein(worldAccess.getBlockState(blockPos))) {
+            return false;
+        }
+
+        if (oreVein.density < Math.random()) {
+            return false;
+        }
 
         int randInt = random.nextInt(100);
         int selectionIndex = 0;
@@ -75,6 +100,7 @@ public class VeinGenerator {
 
         Block selectedBlock = oreVein.blocks.get(selectionIndex);
         worldAccess.setBlockState(blockPos, selectedBlock.getDefaultState(), 0);
+        return true;
     }
 
     private boolean blockIsFloating(OreVeinBlock oreVeinBlock) {
@@ -86,7 +112,7 @@ public class VeinGenerator {
         return true;
     }
 
-    private boolean blockCanBeReplacedByVein(BlockState blockState){
+    private boolean blockCanBeReplacedByVein(BlockState blockState) {
         return blockState.isOf(Blocks.STONE);
     }
 

@@ -2,14 +2,25 @@
   "veins": [
     {
       "blocks": [
-        "minecraft:diamond_block", 80,
-        "minecraft:gold_block", 20
+        "minecraft:diamond_block", 100
       ],
       "yMin": 0,
       "yMax": 100,
-      "size": 100,
+      "size": 5,
       "frequency": 1.5,
-      "density": 0.95,
+      "density": 0.6,
+      "biomes": ["minecraft:plains", "DRY", "ARID"],
+      "dimensions": [-1, 1]
+    },
+    {
+      "blocks": [
+        "minecraft:gold_block", 100
+      ],
+      "yMin": 0,
+      "yMax": 100,
+      "size": 5,
+      "frequency": 0.5,
+      "density": 0.6,
       "biomes": ["minecraft:plains", "DRY", "ARID"],
       "dimensions": [-1, 1]
     }
