@@ -42,7 +42,7 @@ public class BetterOreGenConfig {
             BufferedReader br = new BufferedReader(new FileReader(config));
             json = new JsonParser().parse(br).getAsJsonObject();
         } catch(FileNotFoundException e) {
-            LOGGER.error("BetterOreConfig Not Found", e);
+            LOGGER.error("BetterOreGen Config Not Found", e);
         }
     }
 

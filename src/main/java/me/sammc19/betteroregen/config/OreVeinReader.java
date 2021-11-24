@@ -126,7 +126,7 @@ public class OreVeinReader {
         if (frequency < 0) {
             throw new IllegalArgumentException("Invalid frequency: " + frequency + ", frequency must be positive");
         }
-        return frequency
+        return frequency;
     }
 
     private static float readDensity(JsonElement jsonElement) {
