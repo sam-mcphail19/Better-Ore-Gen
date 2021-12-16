@@ -1,28 +1,50 @@
 {
   "veins": [
     {
+      "name": "vein1",
       "blocks": [
-        "minecraft:diamond_block", 100
+        "minecraft:diamond_block",
+        60,
+        "minecraft:coal_block",
+        40
       ],
-      "yMin": 0,
-      "yMax": 100,
+      "y_min": 0,
+      "y_max": 100,
       "size": 5,
       "frequency": 1.5,
-      "density": 0.6,
-      "biomes": ["minecraft:plains", "DRY", "ARID"],
-      "dimensions": [-1, 1]
+      "density": 0.7,
+      "biomes": [
+        "minecraft:plains",
+        "DRY",
+        "ARID"
+      ],
+      "dimensions": [
+        -1,
+        1
+      ]
     },
     {
+      "name": "vein2",
       "blocks": [
-        "minecraft:gold_block", 100
+        "minecraft:gold_block",
+        20,
+        "minecraft:redstone_block",
+        80
       ],
-      "yMin": 0,
-      "yMax": 100,
+      "y_min": 0,
+      "y_max": 100,
       "size": 5,
       "frequency": 0.5,
-      "density": 0.6,
-      "biomes": ["minecraft:plains", "DRY", "ARID"],
-      "dimensions": [-1, 1]
+      "density": 0.3,
+      "biomes": [
+        "minecraft:plains",
+        "DRY",
+        "ARID"
+      ],
+      "dimensions": [
+        -1,
+        1
+      ]
     }
   ]
 }

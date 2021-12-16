@@ -4,87 +4,96 @@ import net.minecraft.block.Block;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class OreVein {
 
+    public String name;
     public ArrayList<Block> blocks;
     public ArrayList<Integer> blockWeights;
     public int yMin;
     public int yMax;
     public int size;
-    public float frequency;
-    public float density;
+    public double frequency;
+    public double density;
     // Not yet sure how the dimensions/biomes are going to be handled exactly.
     // Will likely end up changing this type at some point in the future.
     public ArrayList<Biome> biomes;
     public ArrayList<Integer> dimensions;
 
-    private OreVein(){ }
+    private OreVein() {
+    }
 
     public static class Builder {
+
+        public String name;
         public ArrayList<Block> blocks;
         public ArrayList<Integer> blockWeights;
         private int yMin;
         private int yMax;
         private int size;
-        private float frequency;
-        private float density;
+        private double frequency;
+        private double density;
         // Not yet sure how the dimensions/biomes are going to be handled exactly.
         // Will likely end up changing this type at some point in the future.
         private ArrayList<Biome> biomes;
         private ArrayList<Integer> dimensions;
 
-        public Builder() { }
+        public Builder() {
+        }
 
-        public Builder withBlocks(ArrayList<Block> blocks){
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder withBlocks(ArrayList<Block> blocks) {
             this.blocks = blocks;
             return this;
         }
 
-        public Builder withBlockWeights(ArrayList<Integer> blockWeights){
+        public Builder withBlockWeights(ArrayList<Integer> blockWeights) {
             this.blockWeights = blockWeights;
             return this;
         }
 
-        public Builder withYMin(int yMin){
+        public Builder withYMin(int yMin) {
             this.yMin = yMin;
             return this;
         }
 
-        public Builder withYMax(int yMax){
+        public Builder withYMax(int yMax) {
             this.yMax = yMax;
             return this;
         }
 
-        public Builder withSize(int size){
+        public Builder withSize(int size) {
             this.size = size;
             return this;
         }
 
-        public Builder withFrequency(float frequency){
+        public Builder withFrequency(double frequency) {
             this.frequency = frequency;
             return this;
         }
 
-        public Builder withDensity(float density){
+        public Builder withDensity(double density) {
             this.density = density;
             return this;
         }
 
-        public Builder withBiomes(ArrayList<Biome> biomes){
+        public Builder withBiomes(ArrayList<Biome> biomes) {
             this.biomes = biomes;
             return this;
         }
 
-        public Builder withDimensions(ArrayList<Integer> dimensions){
+        public Builder withDimensions(ArrayList<Integer> dimensions) {
             this.dimensions = dimensions;
             return this;
         }
 
-        public OreVein build(){
-            //Here we create the actual bank account object, which is always in a fully initialised state when it's returned.
-            OreVein oreVein = new OreVein();  //Since the builder is in the BankAccount class, we can invoke its private constructor.
+        public OreVein build() {
+            OreVein oreVein = new OreVein();
+            oreVein.name = this.name;
             oreVein.blocks = this.blocks;
             oreVein.blockWeights = this.blockWeights;
             oreVein.yMin = this.yMin;
@@ -99,8 +108,9 @@ public class OreVein {
         }
     }
 
-    public String toString(){
-        return String.format("OreVein=(blocks=%s, blockWeights=%s, yMin=%d, yMax=%d, size=%d, frequency=%f, density=%f, biomes=%s, dimensions=%s)",
+    public String toString() {
+        return String.format("OreVein{%s}=(blocks=%s, blockWeights=%s, yMin=%d, yMax=%d, size=%d, frequency=%f, density=%f, biomes=%s, dimensions=%s)",
+                this.name,
                 this.blocks.toString(),
                 this.blockWeights.toString(),
                 this.yMin,

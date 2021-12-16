@@ -19,6 +19,6 @@ public class BetterOreGen implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        BetterOreGenConfig.initializeConfig();
+        BetterOreGenConfig.init();
     }
 }
