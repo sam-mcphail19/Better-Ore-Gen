@@ -35,7 +35,7 @@ public class ConfigScreen extends SpruceScreen {
     public Consumer<SpruceButtonWidget> resetConsumer;
 
     public ConfigScreen(@Nullable Screen parent) {
-        super(Text.of("Text"));
+        super(Text.of("BetterOreGen"));
 
         this.parent = parent;
     }
@@ -56,10 +56,7 @@ public class ConfigScreen extends SpruceScreen {
             this.tabbedWidget.addTabEntry(Text.of(BetterOreGen.oreVeins.get(finalI).name), null,
                     this.tabContainerBuilder((width, height) -> this.buildVeinOption(Position.origin(), width, height, BetterOreGen.oreVeins.get(finalI))));
         }
-        for (int i = 0; i < 15; i++) {
-            this.tabbedWidget.addTabEntry(Text.of(BetterOreGen.oreVeins.get(0).name), null,
-                    this.tabContainerBuilder((width, height) -> this.buildVeinOption(Position.origin(), width, height, BetterOreGen.oreVeins.get(0))));
-        }
+
         this.addDrawableChild(this.tabbedWidget);
     }
 
@@ -108,7 +105,7 @@ public class ConfigScreen extends SpruceScreen {
         });
 
         container.addChild(new SpruceButtonWidget(Position.of(this, width / 2 - 155 + 160, height - 29), 150, 20,
-                SpruceTexts.GUI_DONE,
+                Text.of("Save"),
                 btn -> this.client.setScreen(this.parent)));
 
         return container;
@@ -125,44 +122,44 @@ public class ConfigScreen extends SpruceScreen {
                         () -> oreVeinBlocksListToJsonString(oreVein.blocks),
                         newValue -> oreVein.blocks = jsonStringToOreVeinBlocksList(newValue),
                         null,
-                        Text.of("blocks")
+                        Text.of("Blocks in the vein")
                 ));
         list.addSingleOptionEntry(
                 new SpruceStringOption("betteroregen.option.vein.blockweights",
                         () -> oreVeinBlockWeightsListToJsonString(oreVein.blockWeights),
                         newValue -> oreVein.blockWeights = jsonStringToOreVeinBlockWeightsList(newValue),
                         null,
-                        Text.of("block weights")
+                        Text.of("How frequently the various blocks will appear in the vein")
                 ));
         list.addSingleOptionEntry(
                 new SpruceIntegerInputOption("betteroregen.option.vein.ymin",
                         () -> oreVein.yMin,
                         newValue -> oreVein.yMin = newValue,
-                        Text.of("ymin")
+                        Text.of("The lowest y value that the vein can generate at")
                 ));
         list.addSingleOptionEntry(
                 new SpruceIntegerInputOption("betteroregen.option.vein.ymax",
                         () -> oreVein.yMax,
                         newValue -> oreVein.yMax = newValue,
-                        Text.of("ymax")
+                        Text.of("The highest y value that the vein can generate at")
                 ));
         list.addSingleOptionEntry(
                 new SpruceIntegerInputOption("betteroregen.option.vein.size",
                         () -> oreVein.size,
                         newValue -> oreVein.size = newValue,
-                        Text.of("size")
+                        Text.of("How large the vein is")
                 ));
         list.addSingleOptionEntry(
                 new SpruceDoubleInputOption("betteroregen.option.vein.frequency",
                         () -> oreVein.frequency,
                         newValue -> oreVein.frequency = newValue,
-                        Text.of("frequency")
+                        Text.of("How rare or common the vein is")
                 ));
         list.addSingleOptionEntry(
                 new SpruceDoubleInputOption("betteroregen.option.vein.density",
                         () -> oreVein.density,
                         newValue -> oreVein.density = newValue,
-                        Text.of("density")
+                        Text.of("How much of the vein is made up of ores instead of stone")
                 ));
 
         return list;

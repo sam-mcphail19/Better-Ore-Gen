@@ -14,6 +14,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -33,11 +35,15 @@ public class BetterOreGenConfig {
     public static String DIMENSIONS_KEY = "dimensions";
     public static String BIOMES_KEY = "biomes";
 
+    public static String VEINS_KEY = "veins";
+
     public static boolean isConfigLoaded = false;
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("betteroregen.json");
 
     private static File config;
     private static JsonObject json;
+
+    private static Gson gson;
 
     public static void init() {
         if (isConfigLoaded)
@@ -45,6 +51,10 @@ public class BetterOreGenConfig {
 
         config = new File(CONFIG_PATH.toString());
         load();
+
+        gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
 
         LOGGER.info("BetterOreGen Initialized");
         isConfigLoaded = true;
@@ -71,7 +81,7 @@ public class BetterOreGenConfig {
 
     public static void save() {
         JsonObject betterOreGenConfig = new JsonObject();
-        betterOreGenConfig.add("veins", new JsonArray());
+        betterOreGenConfig.add(VEINS_KEY, new JsonArray());
         for (OreVein oreVein : BetterOreGen.oreVeins) {
             JsonObject oreVeinJson = new JsonObject();
             oreVeinJson.add(NAME_KEY, new JsonPrimitive(oreVein.name));
@@ -81,14 +91,19 @@ public class BetterOreGenConfig {
             oreVeinJson.add(SIZE_KEY, new JsonPrimitive(oreVein.size));
             oreVeinJson.add(FREQUENCY_KEY, new JsonPrimitive(roundDoubleToDecimalPlaces(oreVein.frequency, 3)));
             oreVeinJson.add(DENSITY_KEY, new JsonPrimitive(roundDoubleToDecimalPlaces(oreVein.density, 3)));
-            oreVeinJson.add(DIMENSIONS_KEY, new Gson().toJsonTree(oreVein.dimensions).getAsJsonArray());
-            oreVeinJson.add(BIOMES_KEY, new Gson().toJsonTree(oreVein.biomes).getAsJsonArray());
+            oreVeinJson.add(DIMENSIONS_KEY, gson.toJsonTree(oreVein.dimensions).getAsJsonArray());
+            oreVeinJson.add(BIOMES_KEY, gson.toJsonTree(oreVein.biomes).getAsJsonArray());
 
-            betterOreGenConfig.get("veins").getAsJsonArray().add(oreVeinJson);
+            betterOreGenConfig.get(VEINS_KEY).getAsJsonArray().add(oreVeinJson);
         }
 
-        // TODO Change this to actually write to the file once the full GUI is done
-        LOGGER.info(betterOreGenConfig);
+        try {
+            FileWriter fileWriter = new FileWriter(config);
+            fileWriter.write(gson.toJson(betterOreGenConfig));
+            fileWriter.close();
+        } catch (IOException e) {
+            LOGGER.error(e);
+        }
     }
 
     public static OreVein readVein(JsonObject jsonObject) {
@@ -149,6 +164,11 @@ public class BetterOreGenConfig {
         return blockWeights;
     }
 
+    /*
+        "minecraft:plains",
+        "DRY",
+        "ARID"
+     */
     private static ArrayList<Biome> readBiomes(JsonArray jsonArray) {
         ArrayList<Biome> biomes = new ArrayList<>();
 
