@@ -16,9 +16,13 @@ import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.feature.util.FeatureContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class VeinGenerator {
+
+    private static Map<String, OreVeinInstance> veinMap;
 
     private StructureWorldAccess worldAccess;
     private static final Random random = new Random();
@@ -52,13 +56,14 @@ public class VeinGenerator {
             }
 
             OreVein selectedOreVein = possibleOreVeins.get(selectionIndex);
+            OreVeinInstance oreVeinInstance = new OreVeinInstance(selectedOreVein);
 
             int placed = 0;
             int size = selectedOreVein.size / 2;
             for (int i = x - size; i < x + size; i++) {
                 for (int j = y - size; j < y + size; j++) {
                     for (int k = z - size; k < z + size; k++) {
-                        if (place(selectedOreVein, i, j, k)) {
+                        if (place(oreVeinInstance, i, j, k)) {
                             placed++;
                         }
                     }
@@ -70,12 +75,32 @@ public class VeinGenerator {
         return false;
     }
 
-    private boolean place(OreVein oreVein, int x, int y, int z) {
+    public static void addToVeinMap(BlockPos blockPos, OreVeinInstance oreVeinInstance) {
+        if (veinMap == null) {
+            veinMap = new HashMap<>();
+        }
+
+        veinMap.put(blockPos.toShortString(), oreVeinInstance);
+    }
+
+    public static OreVeinInstance getFromVeinMap(BlockPos blockPos) {
+        if (veinMap == null) {
+            veinMap = new HashMap<>();
+        }
+
+        return veinMap.get(blockPos.toShortString());
+    }
+
+    private boolean place(OreVeinInstance oreVein, int x, int y, int z) {
         ChunkPos chunkPos = worldAccess.getChunk(new BlockPos(x, y, z)).getPos();
         if (!worldAccess.isChunkLoaded(chunkPos.x, chunkPos.z))
             return false;
 
         BlockPos blockPos = new BlockPos(x, y, z);
+
+        if (y < oreVein.veinType.yMin || y > oreVein.veinType.yMax) {
+            return false;
+        }
 
         if (blockIsFloating(new OreVeinBlock(blockPos))) {
             return false;
@@ -85,21 +110,25 @@ public class VeinGenerator {
             return false;
         }
 
-        if (oreVein.density < Math.random()) {
+        if (oreVein.veinType.density < Math.random()) {
             return false;
         }
 
         int randInt = random.nextInt(100);
         int selectionIndex = 0;
-        int weightsSum = oreVein.blockWeights.get(selectionIndex);
+        int weightsSum = oreVein.veinType.blockWeights.get(selectionIndex);
 
         while (weightsSum < randInt) {
             selectionIndex++;
-            weightsSum += oreVein.blockWeights.get(selectionIndex);
+            weightsSum += oreVein.veinType.blockWeights.get(selectionIndex);
         }
 
-        Block selectedBlock = oreVein.blocks.get(selectionIndex);
+        Block selectedBlock = oreVein.veinType.blocks.get(selectionIndex);
         worldAccess.setBlockState(blockPos, selectedBlock.getDefaultState(), 0);
+
+        addToVeinMap(blockPos, oreVein);
+        oreVein.blocks.add(blockPos);
+
         return true;
     }
 
