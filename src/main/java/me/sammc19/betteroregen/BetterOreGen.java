@@ -5,6 +5,7 @@ import me.sammc19.betteroregen.config.BetterOreGenConfig;
 import me.sammc19.betteroregen.generation.OreVein;
 import me.sammc19.betteroregen.generation.VeinGenerator;
 import me.sammc19.betteroregen.generation.feature.BetterOreGenOreFeatureConfig;
+import me.sammc19.betteroregen.util.StringUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
@@ -16,7 +17,6 @@ import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.YOffset;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
