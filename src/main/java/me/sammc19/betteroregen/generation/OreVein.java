@@ -10,6 +10,7 @@ public class OreVein {
     public String name;
     public ArrayList<Block> blocks;
     public ArrayList<Integer> blockWeights;
+    public ArrayList<Block> replaceableBlocks;
     public int yMin;
     public int yMax;
     public int size;
@@ -28,6 +29,7 @@ public class OreVein {
         public String name;
         public ArrayList<Block> blocks;
         public ArrayList<Integer> blockWeights;
+        public ArrayList<Block> replaceableBlocks;
         private int yMin;
         private int yMax;
         private int size;
@@ -53,6 +55,11 @@ public class OreVein {
 
         public Builder withBlockWeights(ArrayList<Integer> blockWeights) {
             this.blockWeights = blockWeights;
+            return this;
+        }
+
+        public Builder withReplaceableBlocks(ArrayList<Block> replaceableBlocks) {
+            this.replaceableBlocks = replaceableBlocks;
             return this;
         }
 
@@ -96,6 +103,7 @@ public class OreVein {
             oreVein.name = this.name;
             oreVein.blocks = this.blocks;
             oreVein.blockWeights = this.blockWeights;
+            oreVein.replaceableBlocks = this.replaceableBlocks;
             oreVein.yMin = this.yMin;
             oreVein.yMax = this.yMax;
             oreVein.size = this.size;
@@ -109,10 +117,11 @@ public class OreVein {
     }
 
     public String toString() {
-        return String.format("OreVein{%s}=(blocks=%s, blockWeights=%s, yMin=%d, yMax=%d, size=%d, frequency=%f, density=%f, biomes=%s, dimensions=%s)",
+        return String.format("OreVein{%s}=(blocks=%s, blockWeights=%s, replaceableBlocks=%s yMin=%d, yMax=%d, size=%d, frequency=%f, density=%f, biomes=%s, dimensions=%s)",
                 this.name,
                 this.blocks.toString(),
                 this.blockWeights.toString(),
+                this.replaceableBlocks.toString(),
                 this.yMin,
                 this.yMax,
                 this.size,

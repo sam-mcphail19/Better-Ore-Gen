@@ -1,6 +1,22 @@
 package me.sammc19.betteroregen.config;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import me.sammc19.betteroregen.BetterOreGen;
 import me.sammc19.betteroregen.generation.OreVein;
 import net.fabricmc.loader.api.FabricLoader;
@@ -10,23 +26,48 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-
 import static me.sammc19.betteroregen.BetterOreGen.LOGGER;
+
 
 public class BetterOreGenConfig {
 
+    public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("betteroregen.json");
+    public static final Set<String> oreFeaturesToRemove = new HashSet<>(
+        List.of(
+            "ore_gold_deltas",
+            "ore_quartz_deltas",
+            "ore_gold_nether",
+            "ore_quartz_nether",
+            "ore_coal",
+            "prototype_ore_coal_upper",
+            "prototype_ore_coal_lower",
+            "ore_iron",
+            "prototype_ore_iron_upper",
+            "prototype_ore_iron_middle",
+            "prototype_ore_iron_small",
+            "ore_gold_extra",
+            "ore_gold",
+            "prototype_ore_gold",
+            "ore_redstone",
+            "prototype_ore_redstone",
+            "prototype_ore_redstone_lower",
+            "ore_diamond",
+            "prototype_ore_diamond",
+            "prototype_ore_diamond_large",
+            "ore_lapis",
+            "prototype_ore_lapis",
+            "prototype_ore_lapis_buried",
+            "ore_emerald",
+            "prototype_ore_emerald",
+            "ore_copper",
+            "prototype_ore_copper"
+        )
+    );
     private static final int WORLD_HEIGHT = 256;
-
+    public static String BASE_FREQUENCY_KEY = "base_frequency";
     public static String NAME_KEY = "name";
     public static String BLOCKS_KEY = "blocks";
+    public static String REPLACEABLE_BLOCKS_KEY = "replaceable_blocks";
     public static String Y_MIN_KEY = "y_min";
     public static String Y_MAX_KEY = "y_max";
     public static String SIZE_KEY = "size";
@@ -34,15 +75,11 @@ public class BetterOreGenConfig {
     public static String DENSITY_KEY = "density";
     public static String DIMENSIONS_KEY = "dimensions";
     public static String BIOMES_KEY = "biomes";
-
     public static String VEINS_KEY = "veins";
-
     public static boolean isConfigLoaded = false;
-    public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("betteroregen.json");
-
+    private static double baseFrequency;
     private static File config;
     private static JsonObject json;
-
     private static Gson gson;
 
     public static void init() {
@@ -53,8 +90,8 @@ public class BetterOreGenConfig {
         load();
 
         gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
+            .setPrettyPrinting()
+            .create();
 
         LOGGER.info("BetterOreGen Initialized");
         isConfigLoaded = true;
@@ -67,6 +104,8 @@ public class BetterOreGenConfig {
         } catch (FileNotFoundException e) {
             LOGGER.error("BetterOreGen Config Not Found", e);
         }
+
+        baseFrequency = json.get(BASE_FREQUENCY_KEY).getAsDouble();
 
         JsonArray veins = json.get("veins").getAsJsonArray();
         for (int i = 0; i < veins.size(); i++) {
@@ -81,11 +120,13 @@ public class BetterOreGenConfig {
 
     public static void save() {
         JsonObject betterOreGenConfig = new JsonObject();
+        betterOreGenConfig.add(BASE_FREQUENCY_KEY, new JsonPrimitive(baseFrequency));
         betterOreGenConfig.add(VEINS_KEY, new JsonArray());
         for (OreVein oreVein : BetterOreGen.oreVeins) {
             JsonObject oreVeinJson = new JsonObject();
             oreVeinJson.add(NAME_KEY, new JsonPrimitive(oreVein.name));
             oreVeinJson.add(BLOCKS_KEY, createJsonBlocksList(oreVein));
+            oreVeinJson.add(REPLACEABLE_BLOCKS_KEY, createReplaceableBlocksList(oreVein));
             oreVeinJson.add(Y_MIN_KEY, new JsonPrimitive(oreVein.yMin));
             oreVeinJson.add(Y_MAX_KEY, new JsonPrimitive(oreVein.yMax));
             oreVeinJson.add(SIZE_KEY, new JsonPrimitive(oreVein.size));
@@ -106,19 +147,20 @@ public class BetterOreGenConfig {
         }
     }
 
-    public static OreVein readVein(JsonObject jsonObject) {
+    private static OreVein readVein(JsonObject jsonObject) {
         OreVein oreVein = new OreVein.Builder()
-                .withName(jsonObject.get(NAME_KEY).getAsString())
-                .withBlocks(readBlocks(jsonObject.get(BLOCKS_KEY).getAsJsonArray()))
-                .withBlockWeights(readBlockWeights(jsonObject.get(BLOCKS_KEY).getAsJsonArray()))
-                .withYMin(readYMin(jsonObject.get(Y_MIN_KEY).getAsInt()))
-                .withYMax(readYMax(jsonObject.get(Y_MAX_KEY).getAsInt()))
-                .withSize(readSize(jsonObject.get(SIZE_KEY).getAsInt()))
-                .withFrequency(readFrequency(jsonObject.get(FREQUENCY_KEY).getAsDouble()))
-                .withDensity(readDensity(jsonObject.get(DENSITY_KEY).getAsDouble()))
-                .withDimensions(readDimensions(jsonObject.get(DIMENSIONS_KEY).getAsJsonArray()))
-                .withBiomes(readBiomes(jsonObject.get(BIOMES_KEY).getAsJsonArray()))
-                .build();
+            .withName(jsonObject.get(NAME_KEY).getAsString())
+            .withBlocks(readBlocks(jsonObject.get(BLOCKS_KEY).getAsJsonArray()))
+            .withBlockWeights(readBlockWeights(jsonObject.get(BLOCKS_KEY).getAsJsonArray()))
+            .withReplaceableBlocks(readReplaceableBlocks(jsonObject.get(REPLACEABLE_BLOCKS_KEY).getAsJsonArray()))
+            .withYMin(readYMin(jsonObject.get(Y_MIN_KEY).getAsInt()))
+            .withYMax(readYMax(jsonObject.get(Y_MAX_KEY).getAsInt()))
+            .withSize(readSize(jsonObject.get(SIZE_KEY).getAsInt()))
+            .withFrequency(readFrequency(jsonObject.get(FREQUENCY_KEY).getAsDouble()))
+            .withDensity(readDensity(jsonObject.get(DENSITY_KEY).getAsDouble()))
+            .withDimensions(readDimensions(jsonObject.get(DIMENSIONS_KEY).getAsJsonArray()))
+            .withBiomes(readBiomes(jsonObject.get(BIOMES_KEY).getAsJsonArray()))
+            .build();
 
         if (oreVein.yMin > oreVein.yMax) {
             throw new IllegalArgumentException("Invalid y_min/y_max: (" + oreVein.yMin + ", " + oreVein.yMax + "), y_max must be greater than y_min.");
@@ -135,11 +177,7 @@ public class BetterOreGenConfig {
         ArrayList<Block> blocks = new ArrayList<>();
 
         for (int i = 0; i < jsonArray.size(); i += 2) {
-            Block block = Registry.BLOCK.get(new Identifier(jsonArray.get(i).getAsString()));
-            if (block == Blocks.AIR && !jsonArray.get(i).getAsString().equals("minecraft:air")) {
-                throw new IllegalArgumentException("Invalid blocks array, " + jsonArray.get(i).getAsString() + " not found.");
-            }
-            blocks.add(block);
+            blocks.add(parseBlock(jsonArray.get(i).getAsString()));
         }
         return blocks;
     }
@@ -162,6 +200,15 @@ public class BetterOreGenConfig {
             throw new IllegalArgumentException("Invalid blocks array: " + jsonArray + ", block weights must sum to 100.");
         }
         return blockWeights;
+    }
+
+    private static ArrayList<Block> readReplaceableBlocks(JsonArray jsonArray) {
+        ArrayList<Block> replaceableBlocks = new ArrayList<>();
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            replaceableBlocks.add(parseBlock(jsonArray.get(i).getAsString()));
+        }
+        return replaceableBlocks;
     }
 
     /*
@@ -235,8 +282,30 @@ public class BetterOreGenConfig {
         return jsonArray;
     }
 
+    private static JsonArray createReplaceableBlocksList(OreVein oreVein) {
+        JsonArray jsonArray = new JsonArray();
+
+        for (Block block : oreVein.replaceableBlocks) {
+            jsonArray.add(Registry.BLOCK.getId(block).toString());
+        }
+
+        return jsonArray;
+    }
+
     private static double roundDoubleToDecimalPlaces(double value, int decimalPlaces) {
         double multiplier = Math.pow(10, decimalPlaces);
         return (double) Math.round(value * multiplier) / multiplier;
+    }
+
+    private static Block parseBlock(String blockString) {
+        Block block = Registry.BLOCK.get(new Identifier(blockString));
+        if (block == Blocks.AIR && !blockString.equals("minecraft:air")) {
+            throw new IllegalArgumentException("Invalid blocks array, " + blockString + " not found.");
+        }
+        return block;
+    }
+
+    public static double getBaseFrequency() {
+        return baseFrequency;
     }
 }
